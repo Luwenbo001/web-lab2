@@ -1,3 +1,5 @@
 /freebase_douban.gz
 *.txt
 *.csv
+*.pyc
+*.log

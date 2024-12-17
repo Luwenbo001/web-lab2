@@ -9,7 +9,15 @@ import torch.nn as nn
 import torch.optim as optim
 
 from model.Embedding_based import Embedding_based
-from parser.parser_Embedding_based import *
+
+# 调试信息
+# print("Current working directory:", os.getcwd())
+# print("sys.path:", sys.path)
+parser_path = os.path.join(os.path.dirname(__file__), 'parser')
+# print("Parser path:", parser_path)
+sys.path.append(parser_path)
+# print("Updated sys.path:", sys.path)
+from parser_Embedding_based import *
 from utils.log_helper import *
 from utils.metrics import *
 from utils.model_helper import *
