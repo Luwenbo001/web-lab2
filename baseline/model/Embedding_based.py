@@ -125,8 +125,20 @@ class Embedding_based(nn.Module):
         item_neg_kg_embed = self.entity_embed(item_neg_ids)                             # (cf_batch_size, embed_dim)
         
         # 8. 为 物品嵌入 注入 实体嵌入的语义信息
-        item_pos_cf_embed = item_pos_embed + item_pos_kg_embed
-        item_neg_cf_embed = item_neg_embed + item_neg_kg_embed                                                     # (cf_batch_size, embed_dim)
+        # item_pos_cf_embed = item_pos_embed + item_pos_kg_embed
+        # item_neg_cf_embed = item_neg_embed + item_neg_kg_embed                                                     # (cf_batch_size, embed_dim)
+        method = 'multiply'
+        if method == 'add':
+            item_pos_cf_embed = item_pos_embed + item_pos_kg_embed
+            item_neg_cf_embed = item_neg_embed + item_neg_kg_embed
+        elif method == 'multiply':
+            item_pos_cf_embed = item_pos_embed * item_pos_kg_embed
+            item_neg_cf_embed = item_neg_embed * item_neg_kg_embed
+        elif method == 'concat':
+            item_pos_cf_embed = torch.cat((item_pos_embed, item_pos_kg_embed), dim=1)
+            item_neg_cf_embed = torch.cat((item_neg_embed, item_neg_kg_embed), dim=1)
+        else:
+            raise ValueError("Unknown method: {}".format(method))
 
         pos_score = torch.sum(user_embed * item_pos_cf_embed, dim=1)                    # (cf_batch_size)
         neg_score = torch.sum(user_embed * item_neg_cf_embed, dim=1)                    # (cf_batch_size)
@@ -173,7 +185,16 @@ class Embedding_based(nn.Module):
         item_kg_embed = self.entity_embed(item_ids)                                     # (n_items, embed_dim)
 
         # 9. 为 物品嵌入 注入 实体嵌入的语义信息
-        item_cf_embed = item_embed + item_kg_embed                                                               # (n_items, embed_dim)
+        # item_cf_embed = item_embed + item_kg_embed                                                               # (n_items, embed_dim)
+        method = 'multiply'
+        if method == 'add':
+            item_cf_embed = item_embed + item_kg_embed
+        elif method == 'multiply':
+            item_cf_embed = item_embed * item_kg_embed
+        elif method == 'concat':
+            item_cf_embed = torch.cat((item_embed, item_kg_embed), dim=1)
+        else:
+            raise ValueError("Unknown method: {}".format(method))
 
         cf_score = torch.matmul(user_embed, item_cf_embed.transpose(0, 1))              # (n_users, n_items)
         
