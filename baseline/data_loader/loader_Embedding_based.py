@@ -30,11 +30,11 @@ class DataLoader(DataLoaderBase):
         # 1. 为KG添加逆向三元组，即对于KG中任意三元组(h, r, t)，添加逆向三元组 (t, r+n_relations, h)，
         #    并将原三元组和逆向三元组拼接为新的DataFrame，保存在 self.kg_data 中。
         
-        n_relations = max(kg_data['r']) + 1# 原来的relations映射到[0, n_relations)
+        n_relations = max(kg_data['r']) + 1
         new_kg = kg_data.copy()
         new_kg[['h', 't']] = new_kg[['t', 'h']]
         new_kg['r'] = new_kg['r'] + n_relations
-        # print(kg_data.shape)
+        # print(kg_data.shape)D
         # print(new_kg.shape)
         self.kg_data = pd.concat([kg_data, new_kg], ignore_index=True)
         # print(self.kg_data.shape)
