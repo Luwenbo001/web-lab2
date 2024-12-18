@@ -14,25 +14,25 @@
 
 因此我们先建立电影的id和电影实体名称的映射，并创建和初始化第一跳子图三元组的集合Graph：
 
-![1](C:\Users\DELL\Desktop\大三计算机作业与实验\WEB信息处理与应用\实验\Lab2\web-lab2\baseline\report_pictures\1.png)
+![1](./Report_img/1.png)
 
 然后读取freebase的数据集，将头实体是电影实体的三元组加进Graph中，同时确保三元组的每个实体都以" http://rdf.freebase.com/ns/ "字符串开头，来保证图谱的质量：
 
-![2](C:\Users\DELL\Desktop\大三计算机作业与实验\WEB信息处理与应用\实验\Lab2\web-lab2\baseline\report_pictures\2.png)
+![2](./Report_img/2.png)
 
 由于第一跳实体符合上述条件的不多，故可以直接在循环中用    Graph.loc[len(Graph)]=list   直接添加到Graph中。
 
 由此我们初步得到了第一跳的子图，接下来我们分别对其头尾实体和关系进行计数：
 
-![3](C:\Users\DELL\Desktop\大三计算机作业与实验\WEB信息处理与应用\实验\Lab2\web-lab2\baseline\report_pictures\3.png)
+![3](./Report_img/3.png)
 
 然后我们采用了20核的设置，筛掉了出现次数不超过50次的头实体和尾实体 ：
 
-<img src="C:\Users\DELL\Desktop\大三计算机作业与实验\WEB信息处理与应用\实验\Lab2\web-lab2\baseline\report_pictures\4.png" alt="4" style="zoom:67%;" /><img src="C:\Users\DELL\Desktop\大三计算机作业与实验\WEB信息处理与应用\实验\Lab2\web-lab2\baseline\report_pictures\5.png" alt="5" style="zoom:67%;" />
+<img src="./Report_img/4.png" alt="4" style="zoom:67%;" /><img src="./Report_img/5.png" alt="5" style="zoom:67%;" />
 
 最后删掉出现次数小于50次的关系，并重置索引值：
 
-![6](C:\Users\DELL\Desktop\大三计算机作业与实验\WEB信息处理与应用\实验\Lab2\web-lab2\baseline\report_pictures\6.png)
+![6](./Report_img/6.png)
 
 由此我们得到了由一跳生成的子图firstjump.csv。
 
@@ -40,15 +40,15 @@
 
 首先我们先分别得到电影实体到id，id到映射id的字典：
 
-![7](C:\Users\DELL\Desktop\大三计算机作业与实验\WEB信息处理与应用\实验\Lab2\web-lab2\baseline\report_pictures\7.png)
+![7](./Report_img/7.png)
 
 然后我们就可以对firstjump.csv生成对应的kg_final1.txt了:
 
-<img src="C:\Users\DELL\Desktop\大三计算机作业与实验\WEB信息处理与应用\实验\Lab2\web-lab2\baseline\report_pictures\8.png" alt="8" style="zoom: 50%;" /><img src="C:\Users\DELL\Desktop\大三计算机作业与实验\WEB信息处理与应用\实验\Lab2\web-lab2\baseline\report_pictures\9.png" alt="9" style="zoom: 50%;" />
+<img src="./Report_img/8.png" alt="8" style="zoom: 50%;" /><img src="./Report_img/9.png" alt="9" style="zoom: 50%;" />
 
 得到的kg_final1.txt的片段如图所示：
 
-<img src="C:\Users\DELL\Desktop\大三计算机作业与实验\WEB信息处理与应用\实验\Lab2\web-lab2\baseline\report_pictures\10.png" alt="10" style="zoom:67%;" />
+<img src="./Report_img/10.png" alt="10" style="zoom:67%;" />
 
 在loader_Embedding_based.py 中我按要求实现了 KG 的构建
 首先为KG添加逆向三元组，即对于KG中任意三元组(h, r, t)，添加逆向三元组 (t, r+n_relations, h)，并将原三元组和逆向三元组拼接为新的DataFrame，保存在 self.kg_data 中。
