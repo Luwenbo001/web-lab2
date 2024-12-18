@@ -127,10 +127,11 @@ class Embedding_based(nn.Module):
         # 8. 为 物品嵌入 注入 实体嵌入的语义信息
         # item_pos_cf_embed = item_pos_embed + item_pos_kg_embed
         # item_neg_cf_embed = item_neg_embed + item_neg_kg_embed                                                     # (cf_batch_size, embed_dim)
-        method = 'multiply'
+        method = 'concat'
         if method == 'add':
             item_pos_cf_embed = item_pos_embed + item_pos_kg_embed
             item_neg_cf_embed = item_neg_embed + item_neg_kg_embed
+            
         elif method == 'multiply':
             item_pos_cf_embed = item_pos_embed * item_pos_kg_embed
             item_neg_cf_embed = item_neg_embed * item_neg_kg_embed
@@ -139,9 +140,13 @@ class Embedding_based(nn.Module):
             item_neg_cf_embed = torch.cat((item_neg_embed, item_neg_kg_embed), dim=1)
         else:
             raise ValueError("Unknown method: {}".format(method))
-
-        pos_score = torch.sum(user_embed * item_pos_cf_embed, dim=1)                    # (cf_batch_size)
-        neg_score = torch.sum(user_embed * item_neg_cf_embed, dim=1)                    # (cf_batch_size)
+        if method == 'concat':
+            user_embed_tmp = torch.cat((user_embed, user_embed), dim=1)
+            pos_score = torch.sum(user_embed_tmp * item_pos_cf_embed, dim=1)                    # (cf_batch_size)
+            neg_score = torch.sum(user_embed_tmp * item_neg_cf_embed, dim=1)  
+        else:
+            pos_score = torch.sum(user_embed * item_pos_cf_embed, dim=1)                    # (cf_batch_size)
+            neg_score = torch.sum(user_embed * item_neg_cf_embed, dim=1)                    # (cf_batch_size)
 
         cf_loss = (-1.0) * torch.log(1e-10 + F.sigmoid(pos_score - neg_score))
         cf_loss = torch.mean(cf_loss)
@@ -186,7 +191,7 @@ class Embedding_based(nn.Module):
 
         # 9. 为 物品嵌入 注入 实体嵌入的语义信息
         # item_cf_embed = item_embed + item_kg_embed                                                               # (n_items, embed_dim)
-        method = 'multiply'
+        method = 'concat'
         if method == 'add':
             item_cf_embed = item_embed + item_kg_embed
         elif method == 'multiply':
@@ -195,8 +200,11 @@ class Embedding_based(nn.Module):
             item_cf_embed = torch.cat((item_embed, item_kg_embed), dim=1)
         else:
             raise ValueError("Unknown method: {}".format(method))
-
-        cf_score = torch.matmul(user_embed, item_cf_embed.transpose(0, 1))              # (n_users, n_items)
+        if method == 'concat':
+            user_embed_tmp = torch.cat((user_embed, user_embed), dim=1)
+            cf_score = torch.matmul(user_embed_tmp, item_cf_embed.transpose(0, 1))              # (n_users, n_items)
+        else:
+            cf_score = torch.matmul(user_embed, item_cf_embed.transpose(0, 1))              # (n_users, n_items)
         
         return cf_score
 
